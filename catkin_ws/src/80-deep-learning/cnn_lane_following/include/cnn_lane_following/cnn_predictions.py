@@ -57,7 +57,7 @@ def movidius_cnn_predictions(graph, fifoIn, fifoOut, img):
     graph.queue_inference_with_fifo_elem(fifoIn, fifoOut, img.astype(np.float32), 'user object')
     output, userobj = fifoOut.read_elem()
 
-    return output[0]
+    return output
 
 
 def destroy_all(object):
@@ -67,4 +67,3 @@ def destroy_all(object):
     object.fifoOut.destroy()
     object.graph.destroy()
     object.device.close()
-
