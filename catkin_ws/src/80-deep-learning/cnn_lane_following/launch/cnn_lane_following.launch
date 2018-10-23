@@ -37,7 +37,7 @@
     </include> -->
 
     <!-- Wheel Driver -->
-    <remap from="wheels_driver_node/wheels_cmd" to="cnn_node/car_cmd"/>
+    <remap from="wheels_driver_node/wheels_cmd" to="cnn_node/wheels_cmd"/>
     <group if="$(arg drive)">
 	     <include if="$(arg live)" file="$(find dagu_car)/launch/wheels_driver_node.launch">
             <arg name="veh" value="$(arg veh)"/>
