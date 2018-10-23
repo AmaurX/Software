@@ -34,7 +34,7 @@ class CNN_lane_following:
 
         img = self.cvbridge.compressed_imgmsg_to_cv2(img_msg)
         img = fun_img_preprocessing(img, 48, 96)  # returns image of shape [1, img_height_size x img_width_size]
-        prediction = self.cnn(self.graph, self.fifoIn, self.fifoOut, img)
+        predictions = self.cnn(self.graph, self.fifoIn, self.fifoOut, img)
 
         car_control_msg = duckietown_msgs.msg.WheelsCmdStamped()
         car_control_msg.header = img_msg.header
