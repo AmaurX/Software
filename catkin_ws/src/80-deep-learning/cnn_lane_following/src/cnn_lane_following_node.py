@@ -22,7 +22,7 @@ class CNN_lane_following:
         self.cvbridge = cv_bridge.CvBridge()
 
         # Publications
-        self.pub = rospy.Publisher("~wheels_cmd", duckietown_msgs.msg.Twist2DStamped, queue_size=1)
+        self.pub = rospy.Publisher("~wheels_cmd", duckietown_msgs.msg.WheelsCmdStamped, queue_size=1)
 
         # Subscriptions
         self.subs = rospy.Subscriber("~compressed", sensor_msgs.msg.CompressedImage, self.receive_img, queue_size=1)
