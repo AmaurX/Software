@@ -11,7 +11,7 @@ def fun_img_preprocessing(image, image_final_height, image_final_width):
     new_img = image[480/3:, :, :]
 
     # transform the color image to grayscale
-    new_img = cv2.cvtColor( new_img[:, :, :], cv2.COLOR_RGB2GRAY )
+    # new_img = cv2.cvtColor( new_img[:, :, :], cv2.COLOR_RGB2GRAY )
 
     # resize the image from 320x640 to 48x96
     new_img = cv2.resize( new_img, ( image_final_width, image_final_height ) )
