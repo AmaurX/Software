@@ -16,7 +16,7 @@ from cnn_lane_following.cnn_predictions import *
 
 class CNN_lane_following:
 
-    def __init__(self, graph_path, use_backstepping):
+    def __init__(self, graph_path, use_bl):
 
         self.graph, self.fifoIn, self.fifoOut = load_movidius_graph(graph_path)
         rospy.loginfo("graph loaded")
@@ -24,7 +24,7 @@ class CNN_lane_following:
         self.cnn = movidius_cnn_predictions
         self.cvbridge = cv_bridge.CvBridge()
 
-        self.use_backstepping = use_backstepping
+        self.use_bl = use_bl
         self.num_of_backsteps = 5
         self.dropout = 7
 
@@ -36,6 +36,9 @@ class CNN_lane_following:
         self.full_img_stack_len = self.num_of_backsteps*(self.dropout-1)
         self.full_img_stack = collections.deque(self.full_img_stack_len*[self.img_flatten_size*[0]], self.full_img_stack_len)
         self.img_stack = []
+
+        self.counter = 0
+        self.active = False
 
 
 
@@ -53,12 +56,19 @@ class CNN_lane_following:
         img = self.cvbridge.compressed_imgmsg_to_cv2(img_msg)
         img = fun_img_preprocessing(img, self.img_height, self.img_width)  # returns image of shape [1, img_height_size x img_width_size]
 
-        if self.use_backstepping:
+        if self.use_bl:
             self.add_to_stack(img)
+            self.counter = (self.counter + 1) % self.full_img_stack_len
+            if self.counter == 0:
+                self.active = True
+                rospy.loginfo("Obtained enough images to (re)start driving")
         else:
             self.img_stack = img
 
-        prediction = self.cnn(self.graph, self.fifoIn, self.fifoOut, self.img_stack)
+        if self.active:
+            prediction = self.cnn(self.graph, self.fifoIn, self.fifoOut, self.img_stack)
+        else:
+            prediction = 0
 
         car_control_msg = duckietown_msgs.msg.Twist2DStamped()
         car_control_msg.header = img_msg.header
@@ -107,7 +117,7 @@ class CNN_lane_following:
 def main():
 
     rospy.init_node("cnn_node")
-    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~use_backstepping"))
+    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~use_bl"))
     rospy.spin()
 
 if __name__ == "__main__":

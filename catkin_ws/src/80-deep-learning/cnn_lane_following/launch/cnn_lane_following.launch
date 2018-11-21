@@ -6,6 +6,7 @@
     <!--<arg name="use_vicon" default="false"/>-->
     <arg name="drive" default="true"/>
     <arg name="live" default="true" doc="if set to true, run the camera and do live detection. "/>
+    <arg name="use_bl" default="true"/>
 
 
     <include file="$(find duckietown)/machines"/>
@@ -26,6 +27,7 @@
         <arg name="veh" value="$(arg veh)"/>
         <arg name="local" value="$(arg local)"/>
 	    <arg name="graph_path" default="$(find cnn_lane_following)/src/movidius_graphs/lane_following.graph"/>
+        <arg name="use_bl" value="$(arg bs)" default="false"/>
     </include>
 
     <!-- car_cmd_switch_node -->
