@@ -1,25 +1,43 @@
 #!/usr/bin/env python
 
 import cv2
-import os 
+import os
+import collections
+import numpy as np
 
 import rospy
 import cv_bridge
 import sensor_msgs.msg
 import duckietown_msgs.msg
 
+
 from mvnc import mvncapi as mvnc
 from cnn_lane_following.cnn_predictions import *
 
 class CNN_lane_following:
 
-    def __init__(self, graph_path):
+    def __init__(self, graph_path, use_backstepping):
 
         self.graph, self.fifoIn, self.fifoOut = load_movidius_graph(graph_path)
         rospy.loginfo("graph loaded")
 
         self.cnn = movidius_cnn_predictions
         self.cvbridge = cv_bridge.CvBridge()
+
+        self.use_backstepping = use_backstepping
+        self.num_of_backsteps = 5
+        self.dropout = 7
+
+        self.img_height = 48
+        self.img_width = 96
+        self.img_channels = 3
+        self.img_flatten_size = self.img_height*self.img_width*self.img_channels
+
+        self.full_img_stack_len = self.num_of_backsteps*(self.dropout-1)
+        self.full_img_stack = collections.deque(self.full_img_stack_len*[self.img_flatten_size*[0]], self.full_img_stack_len)
+        self.img_stack = []
+
+
 
         # Publications
         self.pub = rospy.Publisher("~car_cmd", duckietown_msgs.msg.Twist2DStamped, queue_size=1)
@@ -33,8 +51,14 @@ class CNN_lane_following:
     def receive_img(self, img_msg):
 
         img = self.cvbridge.compressed_imgmsg_to_cv2(img_msg)
-        img = fun_img_preprocessing(img, 48, 96)  # returns image of shape [1, img_height_size x img_width_size]
-        prediction = self.cnn(self.graph, self.fifoIn, self.fifoOut, img)
+        img = fun_img_preprocessing(img, self.img_height, self.img_width)  # returns image of shape [1, img_height_size x img_width_size]
+
+        if self.use_backstepping:
+            self.add_to_stack(img)
+        else:
+            self.img_stack = img
+
+        prediction = self.cnn(self.graph, self.fifoIn, self.fifoOut, self.img_stack)
 
         car_control_msg = duckietown_msgs.msg.Twist2DStamped()
         car_control_msg.header = img_msg.header
@@ -51,6 +75,20 @@ class CNN_lane_following:
 
         self.pub.publish(car_control_msg)
         rospy.loginfo("Publishing car_cmd: u={} w={}".format(car_control_msg.v, car_control_msg.omega) )
+
+    def add_to_stack(self, img):
+        """
+
+        :param img: image of shape [1, img_height_size x img_width_size x num_of_channels]
+        """
+
+        # self.full_img_stack is of shape [num_of_backsteps x dropout, img_height_size x img_width_size x num_of_channels]
+        self.full_img_stack.appendleft(img)
+
+        # self.img_stack is of shape [1, num_of_backsteps x img_height_size x img_width_size x num_of_channels]
+        self.img_stack = []
+        for i in range(0, self.full_img_stack_len, self.dropout):
+            self.img_stack = np.append(self.img_stack, self.full_img_stack[i])
 
     def custom_shutdown(self):
 
@@ -69,7 +107,7 @@ class CNN_lane_following:
 def main():
 
     rospy.init_node("cnn_node")
-    CNN_lane_following(rospy.get_param("~graph_path"))
+    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~use_backstepping"))
     rospy.spin()
 
 if __name__ == "__main__":
