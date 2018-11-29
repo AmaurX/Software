@@ -16,14 +16,14 @@
     <remap from="camera_node/image/compressed" to="cnn_node/compressed"/>
     <include file="$(find duckietown)/launch/camera.launch">
 	     <arg name="veh" value="$(arg veh)"/>
-	     <arg name="local" value="$(arg local)"/>
+	     <arg name="local" value="false"/>
 	     <arg name="config" value="$(arg config)"/>
 	     <arg name="param_file_name" value="$(arg param_file_name)"/>
 	     <arg name="live" value="$(arg live)"/>
     </include>
 
     <!-- CNN Lane Following node -->
-    <include file="$(find cnn_lane_following)/launch/cnn_lane_following_node.launch">
+    <include file="$(find cnn_lane_following)/launch/cnn_lane_following_node_laptop.launch">
         <arg name="veh" value="$(arg veh)"/>
         <arg name="local" value="$(arg local)"/>
 	    <arg name="graph_path" default="$(find cnn_lane_following)/src/movidius_graphs/lane_following.graph"/>
@@ -34,7 +34,7 @@
     <remap from="inverse_kinematics_node/car_cmd" to="cnn_node/car_cmd"/>
     <include file="$(find dagu_car)/launch/inverse_kinematics_node.launch">
         <arg name="veh" value="$(arg veh)"/>
-        <arg name="local" value="$(arg local)"/>
+        <arg name="local" value="false"/>
         <arg name="config" value="$(arg config)"/>
     </include>
 

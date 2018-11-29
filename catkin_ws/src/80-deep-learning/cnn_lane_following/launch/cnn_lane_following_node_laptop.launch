@@ -1,0 +1,25 @@
+<launch>
+    <arg name="veh" doc="Name of vehicle. ex: megaman"/> 
+    <arg name="local" default="true" doc="true for running everything you possibly can on laptop. false for everything running on vehicle."/>
+    <arg name="graph_path" default="$(find cnn_lane_following)/src/graphs/frozen_graph.pb"/>
+    <arg name="use_bl" default="false"/>
+
+    <param name="~graph_path" value="$(arg graph_path)" type="string" />
+    <param name="~use_bl" value="$(arg use_bl)" type="bool" />
+
+
+    <include file="$(find duckietown)/machines"/>
+
+    <group ns="$(arg veh)">
+
+        <!-- run local -->
+        <node if="$(arg local)" pkg="cnn_lane_following" type="cnn_lane_following_node_laptop.py" name="cnn_node"
+              output="screen" clear_params="true" required="true">
+        </node>
+
+        <!-- run remote -->
+        <node unless="$(arg local)" machine="$(arg veh)" pkg="cnn_lane_following" type="cnn_lane_following_node.py"
+              name="cnn_node" output="screen" clear_params="true" required="true">
+        </node>
+    </group>
+</launch>
