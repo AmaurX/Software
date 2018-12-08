@@ -1,11 +1,11 @@
 <launch>
     <arg name="veh" doc="Name of vehicle. ex: megaman"/> 
     <arg name="local" default="true" doc="true for running everything you possibly can on laptop. false for everything running on vehicle."/>
-    <arg name="graph_path" default="$(find cnn_lane_following)/src/graphs/frozen_graph.pb"/>
-    <arg name="use_bl" default="false"/>
+    <arg name="graph_name" default="frozen_graph.pb"/>
+    <arg name="backsteps" default="1"/>
 
-    <param name="~graph_path" value="$(arg graph_path)" type="string" />
-    <param name="~use_bl" value="$(arg use_bl)" type="bool" />
+    <param name="~graph_path" value="$(find cnn_lane_following)/src/graphs/unit_blocks/$(arg graph_name)" type="string" />
+    <param name="~backsteps" value="$(arg backsteps)" type="int" />
 
 
     <include file="$(find duckietown)/machines"/>

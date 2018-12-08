@@ -62,9 +62,9 @@ def fun_img_preprocessing(image, image_final_height, image_final_width):
 
 class CNN_image_stack:
 
-    def __init__(self):
-        self.num_of_backsteps = 5
-        self.dropout = 7
+    def __init__(self,bs,dp):
+        self.num_of_backsteps = bs
+        self.dropout = dp
 
         self.img_height = 48
         self.img_width = 96

@@ -17,7 +17,7 @@ from cnn_lane_following.graph_utils import load_graph
 
 
 class CNN_lane_following:
-    def __init__(self, graph_path, use_bl):
+    def __init__(self, graph_path, bs):
 
         # We use our "load_graph" function
         self.graph = load_graph(graph_path)
@@ -39,9 +39,13 @@ class CNN_lane_following:
 
         self.cvbridge = cv_bridge.CvBridge()
 
-        self.use_bl = use_bl
-        self.num_of_backsteps = 5
+
+        self.num_of_backsteps = bs
         self.dropout = 7
+        if self.num_of_backsteps > 1:
+            self.use_bl = True
+        else:
+            self.use_bl = False
 
         self.img_height = 48
         self.img_width = 96
@@ -50,7 +54,7 @@ class CNN_lane_following:
         self.counter = 0
         self.active = False
 
-        self.cnn_image_stack = CNN_image_stack()
+        self.cnn_image_stack = CNN_image_stack(self.num_of_backsteps, self.dropout)
 
         # Publications
         self.pub = rospy.Publisher("~car_cmd", duckietown_msgs.msg.Twist2DStamped, queue_size=1)
@@ -73,16 +77,22 @@ class CNN_lane_following:
                 self.active = True
                 rospy.loginfo("Obtained enough images to (re)start driving")
         else:
-            self.img_stack = img
+            self.active = True
+            # self.img_stack = img
 
         if self.active:
-            output = self.session.run(self.y, feed_dict={
-                self.x: self.cnn_image_stack.img_stack
-            })
+            if self.use_bl:
+                output = self.session.run(self.y, feed_dict={
+                    self.x: self.cnn_image_stack.img_stack
+                })
+                prediction = output[0][0]
+            else:
+                output = self.session.run(self.y, feed_dict={self.x: img})
+                prediction = output[0][0]
 
-            # print("Output: {}".format(output))
+            print("Output: {}".format(output))
 
-            prediction = output[0][0][0]
+
         else:
             prediction = 0
         # print("Prediction: {}".format(prediction))
@@ -91,14 +101,14 @@ class CNN_lane_following:
         car_control_msg.header = img_msg.header
 
         # adjust translation velocity to v=0.25 m/s for smoother driving
-        original_v = 0.386400014162
-        original_omega = prediction
+        #original_v = 0.386400014162
+        #original_omega = prediction
 
-        new_v = 0.25
-        new_omega = original_omega * new_v / original_v
+        #new_v = 0.25
+        #new_omega = original_omega * new_v / original_v
 
-        car_control_msg.v = new_v
-        car_control_msg.omega = new_omega
+        car_control_msg.v = 0.25
+        car_control_msg.omega = prediction
 
         self.pub.publish(car_control_msg)
         rospy.loginfo("Publishing car_cmd: u={} w={}".format(car_control_msg.v, car_control_msg.omega) )
@@ -136,7 +146,7 @@ class CNN_lane_following:
 def main():
 
     rospy.init_node("cnn_node")
-    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~use_bl"))
+    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~backsteps"))
     rospy.spin()
 
 if __name__ == "__main__":
