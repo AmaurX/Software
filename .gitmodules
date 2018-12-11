@@ -1,0 +1,3 @@
+[submodule "catkin_ws/src/80-deep-learning/duckpit"]
+	path = catkin_ws/src/80-deep-learning/duckpit
+	url = https://github.com/lapandic/duckpit.git

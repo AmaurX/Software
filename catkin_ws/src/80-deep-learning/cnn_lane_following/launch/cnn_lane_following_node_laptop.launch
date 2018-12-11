@@ -13,6 +13,8 @@
     <group ns="$(arg veh)">
 
         <!-- run local -->
+        <remap from="cnn_node/car_cmd" to="inverse_kinematics_node/car_cmd"/>
+        <remap from="cnn_node/compressed" to="camera_node/image/compressed"/>
         <node if="$(arg local)" pkg="cnn_lane_following" type="cnn_lane_following_node_laptop.py" name="cnn_node"
               output="screen" clear_params="true" required="true">
         </node>
