@@ -51,8 +51,6 @@ class JoyMapper(object):
     def cbParamTimer(self,event):
         self.v_gain = rospy.get_param("~speed_gain", 0.5)
         self.omega_gain = rospy.get_param("~steer_gain", 10)
-        self.steer_angle_gain = rospy.get_param("~steer_angle_gain", 0.523)
-        self.simulated_vehicle_length = rospy.get_param("~simulated_vehicle_length", 0.10)
 
     def setupParam(self,param_name,default_value):
         value = rospy.get_param(param_name,default_value)
