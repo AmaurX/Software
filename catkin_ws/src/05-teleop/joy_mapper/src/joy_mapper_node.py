@@ -19,9 +19,9 @@ class JoyMapper(object):
         # Setup Parameters
         self.v_gain = self.setupParam("~speed_gain", 0.41)
         self.omega_gain = self.setupParam("~steer_gain", 8.3)
-        self.bicycle_kinematics = self.setupParam("~bicycle_kinematics", 0)
+        self.bicycle_kinematics = self.setupParam("~bicycle_kinematics", 1)
         self.steer_angle_gain = self.setupParam("~steer_angle_gain", 1)
-        self.simulated_vehicle_length = self.setupParam("~simulated_vehicle_length", 0.18)
+        self.simulated_vehicle_length = self.setupParam("~simulated_vehicle_length", 0.10)
 
         # Publications
         self.pub_car_cmd = rospy.Publisher("~car_cmd", Twist2DStamped, queue_size=1)
@@ -49,7 +49,7 @@ class JoyMapper(object):
         self.pub_parallel_autonomy.publish(pub_msg)
 
     def cbParamTimer(self,event):
-        self.v_gain = rospy.get_param("~speed_gain", 1.0)
+        self.v_gain = rospy.get_param("~speed_gain", 0.5)
         self.omega_gain = rospy.get_param("~steer_gain", 10)
 
     def setupParam(self,param_name,default_value):
