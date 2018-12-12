@@ -48,6 +48,9 @@ class JoyMapper(object):
         self.v_state = 0.0
         self.omega_state = 0.0
 
+        self.v_input = 0.0
+        self.omega_input = 0.0
+
         pub_msg = BoolStamped()
         pub_msg.data = self.state_parallel_autonomy
         pub_msg.header.stamp = self.last_pub_time
@@ -67,13 +70,15 @@ class JoyMapper(object):
 
     def cbJoy(self, joy_msg):
         self.joy = joy_msg
+        self.v_input = self.joy.axes[1]
+        self.omega_input = self.joy.axes[3]
         # self.publishControl()
         self.processButtons(joy_msg)
 
     def publishControl(self,event):
         car_cmd_msg = Twist2DStamped()
         # car_cmd_msg.header.stamp = self.joy.header.stamp
-        self.v_state = self.v_state * self.alpha_v + (1 - self.alpha_v) * self.joy.axes[1] * self.v_gain #Left stick V-axis. Up is positive
+        self.v_state = self.v_state * self.alpha_v + (1 - self.alpha_v) * self.v_input * self.v_gain #Left stick V-axis. Up is positive
         if self.v_state < 0.01:
             self.v_state = 0.0
         car_cmd_msg.v = self.v_state
@@ -84,7 +89,7 @@ class JoyMapper(object):
             car_cmd_msg.omega = car_cmd_msg.v / self.simulated_vehicle_length * math.tan(steering_angle)
         else:
             # Holonomic Kinematics for Normal Driving
-            self.omega_state = self.omega_state * self.alpha_omega + (1 - self.alpha_omega) * self.joy.axes[3] * self.omega_gain
+            self.omega_state = self.omega_state * self.alpha_omega + (1 - self.alpha_omega) * self.omega_input * self.omega_gain
             if self.omega_state < 0.01:
                 self.omega_state = 0.0
             car_cmd_msg.omega = self.omega_state
