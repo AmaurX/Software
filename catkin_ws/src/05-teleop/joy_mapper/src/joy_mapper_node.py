@@ -79,7 +79,7 @@ class JoyMapper(object):
         car_cmd_msg = Twist2DStamped()
         # car_cmd_msg.header.stamp = self.joy.header.stamp
         self.v_state = self.v_state * self.alpha_v + (1 - self.alpha_v) * self.v_input * self.v_gain #Left stick V-axis. Up is positive
-        if self.v_state < 0.01:
+        if abs(self.v_state) < 0.01:
             self.v_state = 0.0
         car_cmd_msg.v = self.v_state
         if self.bicycle_kinematics:
@@ -90,7 +90,7 @@ class JoyMapper(object):
         else:
             # Holonomic Kinematics for Normal Driving
             self.omega_state = self.omega_state * self.alpha_omega + (1 - self.alpha_omega) * self.omega_input * self.omega_gain
-            if self.omega_state < 0.01:
+            if abs(self.omega_state) < 0.01:
                 self.omega_state = 0.0
             car_cmd_msg.omega = self.omega_state
         self.pub_car_cmd.publish(car_cmd_msg)
