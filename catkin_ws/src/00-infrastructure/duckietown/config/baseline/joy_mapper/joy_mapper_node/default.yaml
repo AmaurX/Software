@@ -6,3 +6,5 @@ steer_gain: 8.3
 bicycle_kinematics: 0.0
 steer_angle_gain: 1.04
 simulated_vehicle_length: 0.18
+alpha_v: 0.9
+alpha_omega: 0.2

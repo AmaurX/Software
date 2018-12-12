@@ -22,6 +22,8 @@ class JoyMapper(object):
         self.bicycle_kinematics = self.setupParam("~bicycle_kinematics", 0)
         self.steer_angle_gain = self.setupParam("~steer_angle_gain", 1)
         self.simulated_vehicle_length = self.setupParam("~simulated_vehicle_length", 0.18)
+        self.alpha_v = self.setupParam("~alpha_v", 0.9)
+        self.alpha_omega = self.setupParam("~alpha_omega", 0.2)
 
         # Publications
         self.pub_car_cmd = rospy.Publisher("~car_cmd", Twist2DStamped, queue_size=1)
@@ -35,13 +37,16 @@ class JoyMapper(object):
         self.sub_joy_ = rospy.Subscriber("joy", Joy, self.cbJoy, queue_size=1)
 
         # timer
-        # self.pub_timer = rospy.Timer(rospy.Duration.from_sec(self.pub_timestep),self.publishControl)
+        self.pub_timer = rospy.Timer(rospy.Duration.from_sec(0.01),self.publishControl)
         self.param_timer = rospy.Timer(rospy.Duration.from_sec(1.0),self.cbParamTimer)
         self.has_complained = False
 
         self.state_parallel_autonomy = False
         self.deep_learning = False
         self.state_verbose = False
+
+        self.v_state = 0.0
+        self.omega_state = 0.0
 
         pub_msg = BoolStamped()
         pub_msg.data = self.state_parallel_autonomy
@@ -51,6 +56,8 @@ class JoyMapper(object):
     def cbParamTimer(self,event):
         self.v_gain = rospy.get_param("~speed_gain", 1.0)
         self.omega_gain = rospy.get_param("~steer_gain", 10)
+        self.alpha_v = rospy.get_param("~alpha_v", 0.9)
+        self.alpha_omega = rospy.get_param("~alpha_omega", 0.2)
 
     def setupParam(self,param_name,default_value):
         value = rospy.get_param(param_name,default_value)
@@ -60,13 +67,16 @@ class JoyMapper(object):
 
     def cbJoy(self, joy_msg):
         self.joy = joy_msg
-        self.publishControl()
+        # self.publishControl()
         self.processButtons(joy_msg)
 
     def publishControl(self):
         car_cmd_msg = Twist2DStamped()
-        car_cmd_msg.header.stamp = self.joy.header.stamp
-        car_cmd_msg.v = self.joy.axes[1] * self.v_gain #Left stick V-axis. Up is positive
+        # car_cmd_msg.header.stamp = self.joy.header.stamp
+        self.v_state = self.v_state * self.alpha_v + (1 - self.alpha_v) * self.joy.axes[1] * self.v_gain #Left stick V-axis. Up is positive
+        if self.v_state < 0.01:
+            self.v_state = 0.0
+        car_cmd_msg.v = self.v_state
         if self.bicycle_kinematics:
             # Implements Bicycle Kinematics - Nonholonomic Kinematics
             # see https://inst.eecs.berkeley.edu/~ee192/sp13/pdf/steer-control.pdf
@@ -74,7 +84,10 @@ class JoyMapper(object):
             car_cmd_msg.omega = car_cmd_msg.v / self.simulated_vehicle_length * math.tan(steering_angle)
         else:
             # Holonomic Kinematics for Normal Driving
-            car_cmd_msg.omega = self.joy.axes[3] * self.omega_gain
+            self.omega_state = self.omega_state * self.alpha_omega + (1 - self.alpha_omega) * self.joy.axes[3] * self.omega_gain
+            if self.omega_state < 0.01:
+                self.omega_state = 0.0
+            car_cmd_msg.omega = self.omega_state
         self.pub_car_cmd.publish(car_cmd_msg)
 
 # Button List index of joy.buttons array:
