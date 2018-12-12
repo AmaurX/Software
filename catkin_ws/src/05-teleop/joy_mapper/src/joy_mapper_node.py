@@ -25,6 +25,14 @@ class JoyMapper(object):
         self.alpha_v = self.setupParam("~alpha_v", 0.9)
         self.alpha_omega = self.setupParam("~alpha_omega", 0.2)
 
+        self.emergency_stop = 0.0
+
+        self.v_state = 0.0
+        self.omega_state = 0.0
+
+        self.v_input = 0.0
+        self.omega_input = 0.0
+
         # Publications
         self.pub_car_cmd = rospy.Publisher("~car_cmd", Twist2DStamped, queue_size=1)
         self.pub_joy_override = rospy.Publisher("~joystick_override", BoolStamped, queue_size=1)
@@ -45,13 +53,6 @@ class JoyMapper(object):
         self.deep_learning = False
         self.state_verbose = False
 
-        self.emergency_stop = 0.0
-
-        self.v_state = 0.0
-        self.omega_state = 0.0
-
-        self.v_input = 0.0
-        self.omega_input = 0.0
 
         pub_msg = BoolStamped()
         pub_msg.data = self.state_parallel_autonomy
