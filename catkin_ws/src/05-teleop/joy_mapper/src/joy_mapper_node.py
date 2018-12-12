@@ -81,7 +81,6 @@ class JoyMapper(object):
 
     def publishControl(self,event):
         car_cmd_msg = Twist2DStamped()
-        # car_cmd_msg.header.stamp = self.joy.header.stamp
         self.v_state = self.v_state * self.alpha_v + (1 - self.alpha_v) * self.v_input * self.v_gain #Left stick V-axis. Up is positive
         if abs(self.v_state) < 0.01 or self.emergency_stop == 1.0:
             self.v_state = 0.0
@@ -97,6 +96,7 @@ class JoyMapper(object):
             if abs(self.omega_state) < 0.01:
                 self.omega_state = 0.0
             car_cmd_msg.omega = self.omega_state
+        car_cmd_msg.header.stamp = rospy.Time.now()
         self.pub_car_cmd.publish(car_cmd_msg)
 
 # Button List index of joy.buttons array:
