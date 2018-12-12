@@ -11,7 +11,7 @@ class WheelsDriverNode(object):
         self.estop=False
 
         # Parameters for maximal turning radius
-        self.use_rad_lim        =   self.setupParam("~use_rad_lim", False)
+        self.use_rad_lim        =   self.setupParam("~use_rad_lim", True)
         self.min_rad            =   self.setupParam("~min_rad", 0.08)
         self.wheel_distance     =   self.setupParam("~wheel_distance", 0.103)
 
