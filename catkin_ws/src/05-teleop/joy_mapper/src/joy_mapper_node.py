@@ -70,7 +70,7 @@ class JoyMapper(object):
         # self.publishControl()
         self.processButtons(joy_msg)
 
-    def publishControl(self):
+    def publishControl(self,event):
         car_cmd_msg = Twist2DStamped()
         # car_cmd_msg.header.stamp = self.joy.header.stamp
         self.v_state = self.v_state * self.alpha_v + (1 - self.alpha_v) * self.joy.axes[1] * self.v_gain #Left stick V-axis. Up is positive
