@@ -8,3 +8,4 @@ steer_angle_gain: 1.04
 simulated_vehicle_length: 0.18
 alpha_v: 0.9
 alpha_omega: 0.2
+sample_rate: 0.01

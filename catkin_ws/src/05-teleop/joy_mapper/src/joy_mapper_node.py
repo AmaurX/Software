@@ -24,6 +24,7 @@ class JoyMapper(object):
         self.simulated_vehicle_length = self.setupParam("~simulated_vehicle_length", 0.18)
         self.alpha_v = self.setupParam("~alpha_v", 0.9)
         self.alpha_omega = self.setupParam("~alpha_omega", 0.2)
+        self.sample_rate = self.setupParam("~sample_rate", 0.01)
 
         self.emergency_stop = 0.0
 
@@ -45,7 +46,7 @@ class JoyMapper(object):
         self.sub_joy_ = rospy.Subscriber("joy", Joy, self.cbJoy, queue_size=1)
 
         # timer
-        self.pub_timer = rospy.Timer(rospy.Duration.from_sec(0.01),self.publishControl)
+        self.pub_timer = rospy.Timer(rospy.Duration.from_sec(self.sample_rate),self.publishControl)
         self.param_timer = rospy.Timer(rospy.Duration.from_sec(1.0),self.cbParamTimer)
         self.has_complained = False
 
@@ -64,6 +65,8 @@ class JoyMapper(object):
         self.omega_gain = rospy.get_param("~steer_gain", 10)
         self.alpha_v = rospy.get_param("~alpha_v", 0.9)
         self.alpha_omega = rospy.get_param("~alpha_omega", 0.2)
+        self.sample_rate = rospy.get_param("~sample_rate", 0.01)
+
 
     def setupParam(self,param_name,default_value):
         value = rospy.get_param(param_name,default_value)
