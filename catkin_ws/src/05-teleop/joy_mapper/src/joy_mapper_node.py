@@ -45,6 +45,8 @@ class JoyMapper(object):
         self.deep_learning = False
         self.state_verbose = False
 
+        self.emergency_stop = 0.0
+
         self.v_state = 0.0
         self.omega_state = 0.0
 
