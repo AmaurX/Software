@@ -3,9 +3,13 @@
     <arg name="local" default="true" doc="true for running everything you possibly can on laptop. false for everything running on vehicle."/>
     <arg name="graph_name" default="frozen_graph.pb"/>
     <arg name="backsteps" default="1"/>
+    <arg name="steps_ahead" default="1"/>
+    <arg name="use_prefix" default="1"/>
 
-    <param name="~graph_path" value="$(find cnn_lane_following)/src/graphs/unit_blocks/$(arg graph_name)" type="string" />
+    <param name="~graph_path" value="$(find cnn_lane_following)/src/graphs/$(arg graph_name)" type="string" />
     <param name="~backsteps" value="$(arg backsteps)" type="int" />
+    <param name="~steps_ahead" value="$(arg steps_ahead)" type="int" />
+    <param name="~use_prefix" value="$(arg use_prefix)" type="int" />
 
 
     <include file="$(find duckietown)/machines"/>

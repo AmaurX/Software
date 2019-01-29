@@ -83,7 +83,7 @@ class CNN_image_stack:
         """
 
         # self.full_img_stack is of shape [num_of_backsteps x dropout, img_height_size x img_width_size x num_of_channels]
-        self.full_img_stack.appendleft(img)
+        self.full_img_stack.append(img)
 
         # self.img_stack is of shape [1, num_of_backsteps x img_height_size x img_width_size x num_of_channels]
         self.img_stack = []

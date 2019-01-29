@@ -17,7 +17,7 @@ from cnn_lane_following.graph_utils import load_graph
 
 
 class CNN_lane_following:
-    def __init__(self, graph_path, bs):
+    def __init__(self, graph_path,steps_ahead, bs,use_prefix=1):
 
         # We use our "load_graph" function
         self.graph = load_graph(graph_path)
@@ -33,7 +33,10 @@ class CNN_lane_following:
 
         # We access the input and output nodes
         self.x = self.graph.get_tensor_by_name('prefix/x:0')
-        self.y = self.graph.get_tensor_by_name('prefix/ConvNet/fc_layer_out/BiasAdd:0')
+        if use_prefix == 1:
+            self.y = self.graph.get_tensor_by_name('prefix/ConvNet/fc_layer_out/BiasAdd:0')
+        else:
+            self.y = self.graph.get_tensor_by_name('prefix/fc_layer_out/BiasAdd:0')
 
         rospy.loginfo("graph loaded")
 
@@ -42,6 +45,7 @@ class CNN_lane_following:
 
         self.num_of_backsteps = bs
         self.dropout = 7
+        self.steps_ahead = steps_ahead
         if self.num_of_backsteps > 1:
             self.use_bl = True
         else:
@@ -107,7 +111,10 @@ class CNN_lane_following:
         #new_v = 0.25
         #new_omega = original_omega * new_v / original_v
 
-        car_control_msg.v = 0.25
+        #if self.steps_ahead > 1:
+        #    prediction = prediction[0]
+
+        car_control_msg.v = 0.41
         car_control_msg.omega = prediction
 
         self.pub.publish(car_control_msg)
@@ -146,7 +153,7 @@ class CNN_lane_following:
 def main():
 
     rospy.init_node("cnn_node")
-    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~backsteps"))
+    CNN_lane_following(rospy.get_param("~graph_path"),rospy.get_param("~steps_ahead"),rospy.get_param("~backsteps"),rospy.get_param("~use_prefix"))
     rospy.spin()
 
 if __name__ == "__main__":
