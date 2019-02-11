@@ -8,6 +8,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Float32, String
 import json
 
+
 class LaneFilterNode(object):
 
     def __init__(self):
@@ -23,14 +24,13 @@ class LaneFilterNode(object):
         self.phi_median = []
         self.latencyArray = []
 
-
         # Define Constants
         self.curvature_res = self.filter.curvature_res
 
         # Set parameters to server
-        rospy.set_param('~curvature_res', self.curvature_res) #Write to parameter server for transparancy
+        rospy.set_param('~curvature_res', self.curvature_res)  # Write to parameter server for transparancy
 
-        self.pub_in_lane    = rospy.Publisher("~in_lane",BoolStamped, queue_size=1)
+        self.pub_in_lane = rospy.Publisher("~in_lane", BoolStamped, queue_size=1)
         # Subscribers
         self.sub = rospy.Subscriber("~segment_list", SegmentList, self.processSegments, queue_size=1)
         self.sub_velocity = rospy.Subscriber("~car_cmd", Twist2DStamped, self.updateVelocity)
@@ -39,21 +39,17 @@ class LaneFilterNode(object):
         self.pub_lane_pose = rospy.Publisher("~lane_pose", LanePose, queue_size=1)
         self.pub_belief_img = rospy.Publisher("~belief_img", Image, queue_size=1)
 
-
         self.pub_ml_img = rospy.Publisher("~ml_img", Image, queue_size=1)
 
-
-        self.pub_entropy    = rospy.Publisher("~entropy",Float32, queue_size=1)
-
+        self.pub_entropy = rospy.Publisher("~entropy", Float32, queue_size=1)
 
         # FSM
-        self.sub_switch = rospy.Subscriber("~switch",BoolStamped, self.cbSwitch, queue_size=1)
+        self.sub_switch = rospy.Subscriber("~switch", BoolStamped, self.cbSwitch, queue_size=1)
         self.sub_fsm_mode = rospy.Subscriber("~fsm_mode", FSMState, self.cbMode, queue_size=1)
         self.active = True
 
         # timer for updating the params
         self.timer = rospy.Timer(rospy.Duration.from_sec(1.0), self.updateParams)
-
 
     def cbChangeParams(self, msg):
         data = json.loads(msg.data)
@@ -73,7 +69,6 @@ class LaneFilterNode(object):
             param_val = params[param_name]
             exec("self.filter." + str(param_name) + "=" + str(param_val))
 
-
     def updateParams(self, event):
         if self.filter is None:
             c = rospy.get_param('~filter')
@@ -85,11 +80,9 @@ class LaneFilterNode(object):
     def cbSwitch(self, switch_msg):
         self.active = switch_msg.data
 
-
-    def processSegments(self,segment_list_msg):
+    def processSegments(self, segment_list_msg):
         # Get actual timestamp for latency measurement
         timestamp_now = rospy.Time.now()
-
 
         if not self.active:
             return
@@ -117,7 +110,6 @@ class LaneFilterNode(object):
         # print "d_max = ", d_max
         # print "phi_max = ", phi_max
 
-
         max_val = self.filter.getMax()
         in_lane = max_val > self.filter.min_max
         # build lane pose message to send
@@ -129,19 +121,20 @@ class LaneFilterNode(object):
         # XXX: is it always NORMAL?
         lanePose.status = lanePose.NORMAL
 
-
         if self.curvature_res > 0:
             lanePose.curvature = self.filter.getCurvature(d_max[1:], phi_max[1:])
 
         # publish the belief image
-        belief_img = self.getDistributionImage(self.filter.belief, segment_list_msg.header.stamp)
+        bridge = CvBridge()
+        belief_img = bridge.cv2_to_imgmsg(np.array(255 * self.filter.beliefArray[0]).astype("uint8"), "mono8")
+        belief_img.header.stamp = segment_list_msg.header.stamp
+
         self.pub_lane_pose.publish(lanePose)
         self.pub_belief_img.publish(belief_img)
 
-        
         # Latency of Estimation including curvature estimation
         estimation_latency_stamp = rospy.Time.now() - timestamp_now
-        estimation_latency = estimation_latency_stamp.secs + estimation_latency_stamp.nsecs/1e9
+        estimation_latency = estimation_latency_stamp.secs + estimation_latency_stamp.nsecs / 1e9
         self.latencyArray.append(estimation_latency)
 
         if (len(self.latencyArray) >= 20):
@@ -151,32 +144,25 @@ class LaneFilterNode(object):
         # print("Mean latency of Estimation:................. %s" % np.mean(self.latencyArray))
 
         # TODO (1): see above, method does not exist
-        #self.pub_belief_img.publish(belief_img)
+        # self.pub_belief_img.publish(belief_img)
 
         # also publishing a separate Bool for the FSM
         in_lane_msg = BoolStamped()
         in_lane_msg.header.stamp = segment_list_msg.header.stamp
-        in_lane_msg.data = True #TODO change with in_lane
+        in_lane_msg.data = True  # TODO change with in_lane
         self.pub_in_lane.publish(in_lane_msg)
 
     def cbMode(self, msg):
-        return #TODO adjust self.active
+        return  # TODO adjust self.active
 
-    def updateVelocity(self,twist_msg):
+    def updateVelocity(self, twist_msg):
         self.velocity = twist_msg
 
     def onShutdown(self):
         rospy.loginfo("[LaneFilterNode] Shutdown.")
 
-
     def loginfo(self, s):
         rospy.loginfo('[%s] %s' % (self.node_name, s))
-
-    def getDistributionImage(self, mat, stamp):
-        bridge = CvBridge()
-        img = bridge.cv2_to_imgmsg((255 * mat).astype('uint8'), "mono8")
-        img.header.stamp = stamp
-        return img
 
 
 if __name__ == '__main__':
