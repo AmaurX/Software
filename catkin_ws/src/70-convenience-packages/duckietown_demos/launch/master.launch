@@ -130,7 +130,7 @@
 <arg name="tcp_communication" default="false"/>
 
 <!-- Excersie parameters -->
-<arg name="exercise_name" default="1-1.py"/>
+<arg name="exercise_name" default="1-1"/>
 
 <!-- TODO if vehicle avoidance is turned off, bot will not move... -->
 <!-- Vehicle avoidance control for lane following -->

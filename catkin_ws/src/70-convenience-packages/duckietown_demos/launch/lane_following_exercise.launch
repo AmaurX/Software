@@ -3,7 +3,7 @@
 	<arg name="ai_trafo_mode" default="cb" doc="'cb' for colo balance only; 'both' for color balance and linear trafo"/>
 	<arg name="ai_interval" default="5" doc="interval with which the linear trafo gets updated. color balance is performed every second."/>
 	<arg name="verbose" default="false"/>
-	<arg name="exercise_name" default="1-1.py"/>
+	<arg name="exercise_name" default="1-1"/>
 
 	<!-- start basic args -->
 	<include file="$(find duckietown_demos)/launch/master.launch">

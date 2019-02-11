@@ -1,6 +1,6 @@
 <launch>
 	<arg name="veh"/>
-	<arg name="exercise_name" default="1-1.py"/>
+	<arg name="exercise_name" default="1-1"/>
 	<arg name="config" default="baseline"/>
 	<arg name="param_file_name" default="default" doc="Specify a param file. ex:megaman"/>
 	<arg name="param_file_name_wheels_driver_node" default="default" doc="Specify a param file. ex:megaman"/>
