@@ -137,13 +137,7 @@ class LaneFilterNode(object):
         belief_img = self.getDistributionImage(self.filter.belief, segment_list_msg.header.stamp)
         self.pub_lane_pose.publish(lanePose)
         self.pub_belief_img.publish(belief_img)
-        
-        
-        def getDistributionImage(self, mat, stamp):
-            bridge = CvBridge()
-            img = bridge.cv2_to_imgmsg((255 * mat).astype('uint8'), "mono8")
-            img.header.stamp = stamp
-            return img
+
         
         # Latency of Estimation including curvature estimation
         estimation_latency_stamp = rospy.Time.now() - timestamp_now
@@ -177,6 +171,12 @@ class LaneFilterNode(object):
 
     def loginfo(self, s):
         rospy.loginfo('[%s] %s' % (self.node_name, s))
+
+    def getDistributionImage(self, mat, stamp):
+        bridge = CvBridge()
+        img = bridge.cv2_to_imgmsg((255 * mat).astype('uint8'), "mono8")
+        img.header.stamp = stamp
+        return img
 
 
 if __name__ == '__main__':
