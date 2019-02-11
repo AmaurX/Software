@@ -35,8 +35,8 @@ class lane_controller(object):
         duckietown_root = os.environ['DUCKIETOWN_ROOT'] #assumes they sourced environment.sh
         # Load files for HW-Exercises
 
-        controller_name = rospy.get_param("~controller_name")
-        exercise = controller_name.split("-")
+        exercise_name = rospy.get_param("~exercise_name")
+        exercise = exercise_name.split("-")
 
         self.exercise = exercise
 
@@ -79,7 +79,7 @@ class lane_controller(object):
                     self.arr_delay.append([0, 0, 0, 0, 0, 0, 0])
 
         rospy.loginfo("[%s] Initialized " %(rospy.get_name()))
-        rospy.loginfo("\n\n\n\n\nREADY FOR EXERCISE " + controller_name + "\n\n\n\n\n")
+        rospy.loginfo("\n\n\n\n\nREADY FOR EXERCISE " + exercise_name + "\n\n\n\n\n")
 
         # Setup subscriptions for HWExercise 3
         if int(self.exercise[0]) == 3 and str(self.exercise[1]) != "reference":

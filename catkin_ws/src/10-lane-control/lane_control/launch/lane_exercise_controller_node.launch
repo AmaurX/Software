@@ -1,6 +1,6 @@
 <launch>
 	<arg name="veh"/>
-	<arg name="controller_name" default="controller.py"/>
+	<arg name="exercise_name" default="1-1.py"/>
 	<arg name="config" default="baseline"/>
 	<arg name="param_file_name" default="default" doc="Specify a param file. ex:megaman"/>
 	<arg name="param_file_name_wheels_driver_node" default="default" doc="Specify a param file. ex:megaman"/>
@@ -10,10 +10,6 @@
 	<arg name="node_name" default="lane_exercise_controller_node" doc="name of the node"/>
 	<arg name="node_name_wheels_driver_node" default="wheels_driver_node" doc="name of the node"/>
 
-	<arg name="/exercise/sampling_factor" default="1.0"/>
-	<arg name="/exercise/time_delay" default="0.0"/>
-	<arg name="/exercise/omega_sat" default="4.0" />
-
 	<group ns="$(arg veh)">
 	    <!-- Local -->
 	    <node if="$(arg local)" pkg="$(arg pkg_name)" type="$(arg node_name).py" name="$(arg node_name)" output="screen" clear_params="true" required="true">
@@ -22,10 +18,7 @@
 			<remap from="lane_exercise_controller_node/at_stop_line" to="lane_controller_node/at_stop_line"/>
 			<remap from="lane_exercise_controller_node/fsm_mode" to="lane_controller_node/fsm_mode"/>
 			<remap from="lane_exercise_controller_node/car_cmd" to="lane_controller_node/car_cmd"/>
-			<param name="controller_name" value="$(arg controller_name)"/>
-			<param name="sampling_factor" value="$(arg /exercise/sampling_factor)"/>
-			<param name="time_delay" value="$(arg /exercise/time_delay)"/>
-			<param name="omega_sat" value="$(arg /exercise/omega_sat)" />
+			<param name="exercise_name" value="$(arg exercise_name)"/>
 	        <rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name_wheels_driver_node)/$(arg node_name_wheels_driver_node)/$(arg param_file_name_wheels_driver_node).yaml"/>
 	    </node>
 	    <!-- Remote -->
@@ -36,10 +29,7 @@
 			<remap from="lane_exercise_controller_node/at_stop_line" to="lane_controller_node/at_stop_line"/>
 			<remap from="lane_exercise_controller_node/fsm_mode" to="lane_controller_node/fsm_mode"/>
 			<remap from="lane_exercise_controller_node/car_cmd" to="lane_controller_node/car_cmd"/>
-			<param name="controller_name" value="$(arg controller_name)"/>
-			<param name="sampling_factor" value="$(arg /exercise/sampling_factor)"/>
-			<param name="time_delay" value="$(arg /exercise/time_delay)"/>
-			<param name="omega_sat" value="$(arg /exercise/omega_sat)" />
+			<param name="exercise_name" value="$(arg exercise_name)"/>
 	        <rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name_wheels_driver_node)/$(arg node_name_wheels_driver_node)/$(arg param_file_name_wheels_driver_node).yaml"/>
 	    </node>
 	</group>

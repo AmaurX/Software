@@ -3,11 +3,7 @@
 	<arg name="ai_trafo_mode" default="cb" doc="'cb' for colo balance only; 'both' for color balance and linear trafo"/>
 	<arg name="ai_interval" default="5" doc="interval with which the linear trafo gets updated. color balance is performed every second."/>
 	<arg name="verbose" default="false"/>
-	<arg name="controller_name" default="controller.py"/>
-
-	<arg name="/exercise/sampling_factor" default="1.0" doc="Float Factor which slows sample rate. Ignored if less than 1.0."/>
-	<arg name="/exercise/time_delay" default="0" doc="INT Number of samples to delay controller. Try 40 for a challenge."/>
-	<arg name="/exercise/omega_sat" default="4.0" doc="Float maximum angular velocity. Try 0.1 for a challenge."/>
+	<arg name="exercise_name" default="1-1.py"/>
 
 	<!-- start basic args -->
 	<include file="$(find duckietown_demos)/launch/master.launch">
@@ -24,9 +20,6 @@
 		<arg name="vehicle_avoidance" default="true"/>
         <arg name="/lane_following/lane_controller" default="false"/> <!-- We'll use the exercise controller instead -->
         <arg name="/lane_following/lane_exercise_controller" default="true"/>
-		<arg name="controller_name" value="$(arg controller_name)"/>
-		<arg name="/exercise/sampling_factor" value="$(arg /exercise/sampling_factor)"/>
-		<arg name="/exercise/time_delay" value="$(arg /exercise/time_delay)"/>
-		<arg name="/exercise/omega_sat" value="$(arg /exercise/omega_sat)" />
+		<arg name="exercise_name" value="$(arg exercise_name)"/>
 	</include>
 </launch>
