@@ -23,6 +23,7 @@ matplotlib==1.5.1
 graphviz==0.9
 
 picamera==1.13
+control==0.8.1
 
 # SystemCmd
 jpeg4py
