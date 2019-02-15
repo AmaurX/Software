@@ -63,3 +63,15 @@ traffic-light: check-environment
 
 turn-duration-%: check-environment
 	bash -c "source environment.sh; source set_ros_master.sh $*; source set_vehicle_name.sh $*; rosparam set /$*/open_loop_intersection_control_node/turn_$(type) '[[0.8, 0.43, 0],[$(time), 0.43, 2.896],[0.8, 0.43, 0.0]]'; "
+
+
+
+# Demos for Jacopo Tani's Control Systems II course 2019 (docker)
+csii-ex%: check-environment
+	bash -c "roslaunch duckietown_demos lane_following_exercise.launch exercise_name:=$*"
+
+word-split = $(word $2,$(subst -, ,$1))
+
+csii-edit-ex%: check-environment
+	bash -c "vim CSII/Exercises/HWExercise$(call word-split,$*,1)/controller-$(call word-split,$*,2).py"
+
