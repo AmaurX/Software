@@ -378,6 +378,7 @@
     <!-- Lane Exercise controller -->
 	<group if="$(arg /lane_following/lane_exercise_controller)">
 		<remap from="lane_controller_node/lane_pose" to="lane_filter_node/lane_pose"/>
+		<remap from="lane_exercise_controller_node/veh_pos" to="vehicle_filter_node/pose"/>
 		<!--NO!!! <remap from="fsm_node/mode" to="fsm_node/lane_pose_intersection_navigation"/> --><!--TODO what is this -->
 		<!-- <remap from="lane_controller_node/lane_pose_obstacle_avoidance" to="lane_filter_node/lane_pose_obstacle_avoidance"/> TODO: add correct node_name
 		<remap from="lane_controller_node/lane_pose_parking" to="lane_filter_node/lane_pose_parking"/>
