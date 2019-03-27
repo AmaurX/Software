@@ -21,6 +21,7 @@ class lane_controller(object):
 
         # Publicaiton
         self.pub_car_cmd = rospy.Publisher("~car_cmd", Twist2DStamped, queue_size=1)
+        self.pub_car_cmd_ex2 = rospy.Publisher("~veh_car_cmd", Twist2DStamped, queue_size=1)
 
         # Subscriptions
         self.sub_lane_reading = rospy.Subscriber("~lane_pose", LanePose, self.cbPose, queue_size=1)
@@ -81,8 +82,8 @@ class lane_controller(object):
         rospy.loginfo("[%s] Initialized " %(rospy.get_name()))
         rospy.loginfo("\n\n\n\n\nREADY FOR EXERCISE " + exercise_name + "\n\n\n\n\n")
 
-        # Setup subscriptions for HWExercise 3
-        if int(self.exercise[0]) == 3 and str(self.exercise[1]) != "reference":
+        # Setup subscriptions for HWExercise 2
+        if int(self.exercise[0]) == 2 and str(self.exercise[1]) != "reference":
             self.sub_veh_pos = rospy.Subscriber("~veh_pos", VehiclePose, self.cbVehPose, queue_size=1)
 
 
@@ -132,7 +133,7 @@ class lane_controller(object):
         car_control_msg.header = pose_msg.header
         car_control_msg.v = v_out
         car_control_msg.omega = omega_out
-        self.publishCmd(car_control_msg)
+        self.publishCmd_ex2(car_control_msg)
 
         # Update last timestamp
         self.last_ms = currentMillis
@@ -154,7 +155,7 @@ class lane_controller(object):
 
 
     def cbPose(self, lane_pose_msg):
-        if int(self.exercise[0]) == 3 and str(self.exercise[1]) != "reference":
+        if int(self.exercise[0]) == 2 and str(self.exercise[1]) != "reference":
             return
 
 
@@ -270,6 +271,11 @@ class lane_controller(object):
 
     def publishCmd(self, car_cmd_msg):
         self.pub_car_cmd.publish(car_cmd_msg)
+
+
+    def publishCmd_ex2(self, car_cmd_msg):
+        self.pub_car_cmd_ex2.publish(car_cmd_msg)
+
 
 
 if __name__ == "__main__":

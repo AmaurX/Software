@@ -18,6 +18,8 @@
 			<remap from="lane_exercise_controller_node/at_stop_line" to="lane_controller_node/at_stop_line"/>
 			<remap from="lane_exercise_controller_node/fsm_mode" to="lane_controller_node/fsm_mode"/>
 			<remap from="lane_exercise_controller_node/car_cmd" to="lane_controller_node/car_cmd"/>
+			<remap from="lane_exercise_controller_node/veh_car_cmd" to="vehicle_avoidance_control_node/car_cmd"/>
+
 			<param name="exercise_name" value="$(arg exercise_name)"/>
 	        <rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name_wheels_driver_node)/$(arg node_name_wheels_driver_node)/$(arg param_file_name_wheels_driver_node).yaml"/>
 	    </node>
@@ -29,6 +31,8 @@
 			<remap from="lane_exercise_controller_node/at_stop_line" to="lane_controller_node/at_stop_line"/>
 			<remap from="lane_exercise_controller_node/fsm_mode" to="lane_controller_node/fsm_mode"/>
 			<remap from="lane_exercise_controller_node/car_cmd" to="lane_controller_node/car_cmd"/>
+			<remap from="lane_exercise_controller_node/veh_car_cmd" to="vehicle_avoidance_control_node/car_cmd"/>
+
 			<param name="exercise_name" value="$(arg exercise_name)"/>
 	        <rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name_wheels_driver_node)/$(arg node_name_wheels_driver_node)/$(arg param_file_name_wheels_driver_node).yaml"/>
 	    </node>
